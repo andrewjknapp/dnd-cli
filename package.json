@@ -1,0 +1,19 @@
+{
+  "name": "dnd-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chalk": "^5.0.1",
+    "cheerio": "^1.0.0-rc.10",
+    "inquirer": "^8.2.1",
+    "node-fetch": "^3.2.2"
+  }
+}
