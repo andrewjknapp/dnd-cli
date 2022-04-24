@@ -26,28 +26,29 @@ const helpMessage = () => {
 
   const msg = `
     List of available commands
-    help    - lists commands 
-    test    - debug utility
-    spell   - Type the name of a spell to get its information.
-              Do not include punctuation in the name.
-    roll    - Enter dice to be rolled in the following format
-              Input:  1d12 3d6 2d8[radiant]
-              Output: 1d12: 9
-                      3d6: 15
-                      2d8[radiant]: 4
-                      sum: 35
-              Enter as many dice rolls as you want space separated.
-              The format should be
-              "number of dice"d"type of die"[other info ie. damage type]
-    monster - Enter monster's name to get its information
-    race    - Enter name of a race to get its information
-    quit    - ends process
+    help      - lists commands 
+    test      - debug utility
+    spell     - Type the name of a spell to get its information.
+                Do not include punctuation in the name.
+    condition - Enter condition name to view information.
+    roll      - Enter dice to be rolled in the following format
+                Input:  1d12 3d6 2d8[radiant]
+                Output: 1d12: 9
+                        3d6: 15
+                        2d8[radiant]: 4
+                        sum: 35
+                Enter as many dice rolls as you want space separated.
+                The format should be
+                "number of dice"d"type of die"[other info ie. damage type]
+    monster   - Enter monster's name to get its information
+    race      - Enter name of a race to get its information
+    quit      - ends process
   `
   console.log(msg);
 }
 
 const test = async () => {
-
+  console.log("This is a test");
 }
 
 const colorTest = () => {
@@ -162,6 +163,30 @@ const roll = async () => {
     total += sum;
   })
   console.log(`sum: ${total}\n`)
+}
+
+const condition = async () => {
+  const { searchCondition } = await inquirer.prompt([
+    {
+      'type':    'text',
+      'message': '|',
+      'prefix':  '[condition]',
+      'name':    'searchCondition'
+    }
+  ])
+
+  const formattedCondition = searchCondition.split(' ').join('-').toLowerCase();
+
+  const response = await fetch('https://www.dnd5eapi.co/api/conditions/' + formattedCondition);
+  let body = await response.json();
+
+  console.log('\n' + chalk.red(`${body.name}`) + '\n');
+
+  body.desc.forEach(line => {
+    console.log(line);
+  })
+
+  console.log();
 }
 
 const race = async () => {
@@ -303,6 +328,7 @@ const main = async () => {
     else if (prompt == 'test') await test();
     // else if (prompt === 'search') await search();
     else if (prompt == 'spell'   || prompt == 's' ) await spell();
+    else if (prompt == 'condition' || prompt == 'c') await condition();
     else if (prompt == 'roll'    || prompt == 'r' ) await roll();
     else if (prompt == 'race'    || prompt == 'ra') await race();
     else if (prompt == 'monster' || prompt == 'm' ) await monster(); 
