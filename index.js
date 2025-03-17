@@ -3,6 +3,9 @@ import inquirer from 'inquirer';
 import chalk from 'chalk';
 import {baseUrl, initialize, parseCategory, renderResult, rollDice} from './utils.js';
 import cheerio from 'cheerio';
+import fs from 'fs'
+
+const spellsJSON = JSON.parse(fs.readFileSync('spells.json', 'utf-8'))
 
 let options;
 
@@ -88,7 +91,13 @@ const monster = async () => {
 
   const formattedInput = input.split(' ').join('-').toLowerCase();
 
-  const response = await fetch(baseUrl + '/api/monsters/' + formattedInput);
+  let response
+  try {
+    response = await fetch(baseUrl + '/api/monsters/' + formattedInput);
+  } catch {
+    console.log("Not connected to internet")
+    return
+  }
   const data = await response.json();
 
   if (data.error) {
@@ -144,10 +153,27 @@ const roll = async () => {
     }
   ])
 
-  const dice = input.split(" ").map(die => {
+  let rollIsSwarmCalculation = input.indexOf('>') !== -1
+  let diceString = input
+  let AC
+  let rollModifier = 0
+
+  // The > symbol is only compatible with the d20. 
+  // Roll the d20 
+
+  if (rollIsSwarmCalculation) {
+    diceString = input.slice(0, input.indexOf('d') + 3)
+    AC = input.slice(input.indexOf('>') + 2)
+
+    if (input.indexOf('+') !== -1) {
+      rollModifier = Number(input.slice(input.indexOf('+'), input.indexOf('>') - 1))
+    }
+  }
+
+  const dice = diceString.split(" ").map(die => {
     const dIdx = die.indexOf('d');
     let bracketIdx = die.indexOf('[');
-    if (bracketIdx === -1) bracketIdx = input.length;
+    if (bracketIdx === -1) bracketIdx = diceString.length;
 
     return {
       input: die,
@@ -156,13 +182,26 @@ const roll = async () => {
     }
   });
 
-  let total = 0;
-  dice.forEach((die) => {
-    let { sum, rolls } = rollDice(die.number, die.type)
-    console.log(die.input, ':', sum, chalk.grey(`(${rolls.join(', ')})`));
-    total += sum;
-  })
-  console.log(`sum: ${total}\n`)
+  if (rollIsSwarmCalculation) {
+    console.log(`Swarm Roll\n\tRolling ${dice[0].number} attacks\n\tTarget AC: ${AC}\n\tRoll Modifier: ${rollModifier}`)
+
+    const { rolls } = rollDice(dice[0].number, 20)
+
+    console.log('\tRaw Rolls: ', chalk.grey(`(${rolls.join(', ')})`));
+
+    const rollsThatAreHits = rolls.map(roll => roll + rollModifier).filter(roll => roll >= AC)
+
+    console.log('  Hits: ', rollsThatAreHits.length, ' | ', chalk.grey(`(${rollsThatAreHits.join(', ')})`))
+  } 
+  else {
+    let total = 0;
+    dice.forEach((die) => {
+      let { sum, rolls } = rollDice(die.number, die.type)
+      console.log(die.input, ':', sum, chalk.grey(`(${rolls.join(', ')})`));
+      total += sum;
+    })
+    console.log(`sum: ${total}\n`)
+  }
 }
 
 const condition = async () => {
@@ -177,7 +216,13 @@ const condition = async () => {
 
   const formattedCondition = searchCondition.split(' ').join('-').toLowerCase();
 
-  const response = await fetch('https://www.dnd5eapi.co/api/conditions/' + formattedCondition);
+  let response;
+  try {
+    response = await fetch('https://www.dnd5eapi.co/api/conditions/' + formattedCondition);
+  } catch {
+    console.log("Not connected to internet")
+    return
+  }
   let body = await response.json();
 
   console.log('\n' + chalk.red(`${body.name}`) + '\n');
@@ -201,7 +246,14 @@ const race = async () => {
 
   const formattedRace = searchRace.split(' ').join('-').toLowerCase();
 
-  const response = await fetch('http://dnd5e.wikidot.com/' + formattedRace);
+  let response
+
+  try {
+    response = await fetch('http://dnd5e.wikidot.com/' + formattedRace);
+  } catch {
+    console.log("Not connected to internet")
+    return
+  }
   let body = await response.text();
 
   const $ = cheerio.load(body);
@@ -236,25 +288,64 @@ const spell = async () => {
 
   const formattedSpell = searchSpell.split(' ').join('-').toLowerCase();
 
-  const response = await fetch('http://dnd5e.wikidot.com/spell:' + formattedSpell);
-  let body = await response.text();
+  let response;
+  let connectedToInternet = true
+  try {
+    response = await fetch('http://dnd5e.wikidot.com/spell:' + formattedSpell);
 
-  const $ = cheerio.load(body);
+  } catch {
+    connectedToInternet = false
+  }
 
-  const title = $('.page-title').text();
+  if (connectedToInternet) {
+    let body = await response.text();
 
-  console.log('\n' + chalk.red(`${title}`) + '\n');
-  const pageContent = $('#page-content').text().trim().split('\n');
-
-  for (let line of pageContent) {
-    if (line.includes(':') && line.indexOf(':') < 13) {
-      line = line.split(':');
-      console.log(chalk.red(line[0]) + ':', line[1]);
-    } else {
-      if (line.length < 1) continue;
-      console.log();
-      console.log(line)
+    const $ = cheerio.load(body);
+  
+    const title = $('.page-title').text();
+  
+    console.log('\n' + chalk.red(`${title}`) + '\n');
+    const pageContent = $('#page-content').text().trim().split('\n');
+  
+    for (let line of pageContent) {
+      if (line.includes(':') && line.indexOf(':') < 13) {
+        line = line.split(':');
+        console.log(chalk.red(line[0]) + ':', line[1]);
+      } else {
+        if (line.length < 1) continue;
+        console.log();
+        console.log(line)
+      }
     }
+  }
+  else {
+
+    let selectedSpell = null;
+    for (let i = 0; i < spellsJSON.length; i++) {
+      if (spellsJSON[i].name.toLowerCase() === searchSpell.toLowerCase()) {
+        selectedSpell = spellsJSON[i]
+        break
+      }
+    }
+
+    if (!selectedSpell) {
+      console.log('Spell not found')
+      return
+    }
+
+    console.log('\n' + chalk.red(selectedSpell.name) + '\n');
+
+    console.log(chalk.red('Source') + ': Player\'s Handbook\n')
+
+    console.log(selectedSpell.type)
+
+    console.log(chalk.red('Casting time') + ': ' + selectedSpell.casting_time)
+    console.log(chalk.red('Range') + ': ' + selectedSpell.range)
+    console.log(chalk.red('Components') + ': ' + selectedSpell.components.raw)
+    console.log(chalk.red('Duration') + ': ' + selectedSpell.duration + '\n')
+    console.log(selectedSpell.description + '\n')
+
+    console.log(chalk.red('Classes') + ': ' + selectedSpell.classes.join(', '))
   }
 
   console.log();

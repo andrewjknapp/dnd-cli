@@ -1,0 +1,1 @@
+[](https://character-service.dndbeyond.com/character/v5/known-infusions?characterId=47555183)

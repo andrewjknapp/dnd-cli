@@ -1,0 +1,145 @@
+{
+  "playerName": "Andrew",
+  "name": "Aegeus",
+  "sex": "Male",
+  "race": "Warforged",
+  "class": "Paladin",
+  "alignment": "Good",
+  "background": "",
+  "level": 16,
+  "experience": 0,
+  "proficiency": 4,
+  "inspiration": true,
+  "armorClass": 25,
+  "initiative_modifier": 0,
+  "speed": 30,
+  "hitPoints": {
+    "maximum": 180,
+    "current": 180,
+    "temporary": 0
+  },
+  "hitDice": {
+    "roll": {
+      "die": 8,
+      "count": 1
+    },
+    "current": 16
+  },
+  "deathSaves": {
+    "successes": 0,
+    "failures": 0
+  },
+  "equipment": {
+    "money": {
+      "cp": 0,
+      "sp": 0,
+      "ep": 0,
+      "gp": 9900,
+      "pp": 3888
+    },
+    "items": []
+  },
+  "abilities": {
+    "strength": {
+      "base": 18,
+      "proficient": false
+    },
+    "dexterity": {
+      "base": 11,
+      "proficient": false
+    },
+    "constitution": {
+      "base": 16,
+      "proficient": false
+    },
+    "intelligence": {
+      "base": 14,
+      "proficient": false
+    },
+    "wisdom": {
+      "base": 9,
+      "proficient": true
+    },
+    "charisma": {
+      "base": 20,
+      "proficient": true
+    }
+  },
+  "skills": {
+    "acrobatics": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "animalHandling": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "arcana": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "athletics": {
+      "modifiers": 0,
+      "proficient": true
+    },
+    "deception": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "history": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "insight": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "intimidation": {
+      "modifiers": 0,
+      "proficient": true
+    },
+    "investigation": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "medicine": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "nature": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "perception": {
+      "modifiers": 0,
+      "proficient": true
+    },
+    "performance": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "persuasion": {
+      "modifiers": 0,
+      "proficient": true
+    },
+    "religion": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "sleightOfHand": {
+      "modifiers": 0,
+      "proficient": true
+    },
+    "stealth": {
+      "modifiers": 0,
+      "proficient": false
+    },
+    "survival": {
+      "modifiers": 0,
+      "proficient": false
+    }
+  },
+  "attacksAndSpells": {
+    "basic": []
+  }
+}

@@ -7,7 +7,13 @@ const getCategoryOptions = async () => {
 }
 
 export const initialize = async () => {
-  let baseCategories = await (await fetch(baseUrl + '/api')).json();
+  let baseCategories
+  try {
+    baseCategories = await (await fetch(baseUrl + '/api')).json();
+  } catch {
+    console.log("Not connected to internet")
+    return
+  }
 
   return { baseCategories };
 }
